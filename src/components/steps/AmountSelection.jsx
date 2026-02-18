@@ -21,14 +21,12 @@ export default function AmountSelection({ formData, setFormData, onNext, isDeskt
 
     if (newQty > 0) {
       if (existingItemIndex >= 0) {
-        // Update existing
         newCart[existingItemIndex] = {
           ...newCart[existingItemIndex],
           quantity: newQty,
           total: cause.unitCost * newQty
         };
       } else {
-        // Add new
         newCart.push({
           id: cause.id,
           title: cause.title,
@@ -39,13 +37,11 @@ export default function AmountSelection({ formData, setFormData, onNext, isDeskt
         });
       }
     } else {
-      // Remove if 0
       if (existingItemIndex >= 0) {
         newCart.splice(existingItemIndex, 1);
       }
     }
 
-    // Calculate Grand Total
     const grandTotal = newCart.reduce((sum, item) => sum + item.total, 0);
 
     setFormData(prev => ({
@@ -55,7 +51,6 @@ export default function AmountSelection({ formData, setFormData, onNext, isDeskt
     }));
   };
 
-  // Initialize with at least 1 item if empty
   useEffect(() => {
     if ((!formData.cart || formData.cart.length === 0) && formData.amount === 0) {
        updateCart(CAUSES[0].id, 1);
@@ -66,6 +61,7 @@ export default function AmountSelection({ formData, setFormData, onNext, isDeskt
 
   return (
     <div className="h-full flex flex-col">
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-slate-900">Choose Impact</h2>
         <div className="flex items-center gap-2 bg-slate-100 text-slate-600 px-3 py-1 rounded-full">
@@ -74,8 +70,9 @@ export default function AmountSelection({ formData, setFormData, onNext, isDeskt
         </div>
       </div>
 
-      {/* Cards List */}
-      <div className="space-y-3 mb-6 overflow-y-auto pr-1 -mr-2 pb-2 custom-scrollbar min-h-[300px]">
+      {/* List - SCROLLBAR REMOVED */}
+      {/* Removed: overflow-y-auto, min-h-[300px], custom-scrollbar */}
+      <div className="space-y-3 mb-6">
         {CAUSES.map(cause => {
           const inCart = formData.cart?.find(item => item.id === cause.id);
           return (
@@ -83,10 +80,7 @@ export default function AmountSelection({ formData, setFormData, onNext, isDeskt
               key={cause.id}
               cause={cause}
               isSelected={!!inCart}
-              onSelect={(id) => {
-                 // If not in cart, add 1. If in cart, do nothing (click just highlights)
-                 if (!inCart) updateCart(id, 1);
-              }}
+              onSelect={(id) => { if (!inCart) updateCart(id, 1); }}
               quantity={inCart?.quantity || 0}
               onUpdateQuantity={updateCart}
             />
@@ -94,6 +88,7 @@ export default function AmountSelection({ formData, setFormData, onNext, isDeskt
         })}
       </div>
 
+      {/* Footer Pushed to Bottom */}
       <div className="mt-auto">
         <div className="flex justify-between items-end mb-2 px-1">
           <div>
@@ -108,7 +103,6 @@ export default function AmountSelection({ formData, setFormData, onNext, isDeskt
           </div>
         </div>
 
-        {/* Improved Tax Visualizer */}
         <TaxVisualizer 
           amount={formData.amount || 0} 
           isOpen={showTax} 

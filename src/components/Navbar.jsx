@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Heart } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import logo from '../assets/logo.png'; // Ensure this path is correct based on file structure
+import logo from '../assets/logo.png';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -53,17 +53,6 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* CTA Button */}
-        <div className="hidden md:flex items-center gap-4">
-          <Link
-            to="/donate"
-            className="px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-full shadow-lg hover:bg-indigo-600 hover:shadow-indigo-500/30 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2"
-          >
-            <span>Donate Now</span>
-            <Heart size={16} className="text-rose-400 fill-rose-400" />
-          </Link>
-        </div>
-
         {/* Mobile Menu Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -93,13 +82,6 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              <Link
-                to="/donate"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full text-center px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl mt-4"
-              >
-                Donate Now
-              </Link>
             </div>
           </motion.div>
         )}

@@ -1,15 +1,21 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Download, Heart } from 'lucide-react';
+import { TrendingUp, Download, Heart, Calendar, CreditCard, Smartphone, CheckCircle2 } from 'lucide-react';
 import { useDonation } from '../hooks/useDonation';
 
 export default function Dashboard() {
-  const { history } = useDonation(); // Use the hook to access shared history
+  const { history } = useDonation();
 
-  // Calculate real totals
-  const totalDonated = history.reduce((sum, item) => sum + item.amount, 0);
-  const totalUnits = history.reduce((sum, item) => sum + item.units, 0);
-  const totalTaxSaved = Math.round(totalDonated * 0.15);
+  // FIX: Calculate total units by iterating through the cart of each history item
+  const totalDonated = history.reduce((sum, item) => sum + (item.amount || 0), 0);
+  
+  const totalUnits = history.reduce((sum, item) => {
+    // Check if cart exists, then sum quantities of all items in that cart
+    const cartUnits = item.cart ? item.cart.reduce((cSum, cItem) => cSum + (cItem.quantity || 0), 0) : 0;
+    return sum + cartUnits;
+  }, 0);
+
+  const totalTaxSaved = Math.round(totalDonated * 0.15); // Est. 15% saving average
 
   const stats = [
     { 
@@ -17,114 +23,137 @@ export default function Dashboard() {
       value: `₹${totalDonated.toLocaleString()}`, 
       icon: TrendingUp, 
       color: "text-emerald-600", 
-      bg: "bg-emerald-50" 
+      bg: "bg-emerald-50",
+      border: "border-emerald-100"
     },
     { 
-      label: "Impact Created", 
-      value: `${totalUnits} Units`, 
+      label: "Lives Impacted", 
+      value: `${totalUnits} Units`, // Fixed NaN here
       icon: Heart, 
       color: "text-rose-600", 
-      bg: "bg-rose-50" 
+      bg: "bg-rose-50",
+      border: "border-rose-100"
     },
     { 
       label: "Tax Saved (80G)", 
       value: `₹${totalTaxSaved.toLocaleString()}`, 
       icon: Download, 
       color: "text-indigo-600", 
-      bg: "bg-indigo-50" 
+      bg: "bg-indigo-50",
+      border: "border-indigo-100"
     },
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
-      <div className="max-w-7xl mx-auto px-6 pt-10 space-y-8">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 pt-10 space-y-8">
         
-        <div className="flex justify-between items-end">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
-                <h1 className="text-3xl font-extrabold text-slate-900">Your Impact Dashboard</h1>
-                <p className="text-slate-500 mt-1">Track your contributions and download tax certificates.</p>
+                <h1 className="text-3xl font-extrabold text-slate-900">Your Impact Journey</h1>
+                <p className="text-slate-500 mt-1">Track your contributions and tax benefits.</p>
             </div>
-            <button className="hidden md:block bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 transition">
-                Export Report
+            <button className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-50 transition flex items-center gap-2">
+                <Download size={16} />
+                <span>Tax Report</span>
             </button>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {stats.map((stat, i) => (
             <motion.div 
               key={i}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="p-6 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
+              className={`p-5 rounded-2xl bg-white border ${stat.border} shadow-sm flex items-center gap-4`}
             >
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color}`}>
-                    <stat.icon size={24} />
-                </div>
-                <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">{stat.label}</p>
-                    <p className="text-3xl font-extrabold text-slate-900">{stat.value}</p>
-                </div>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color}`}>
+                  <stat.icon size={24} />
+              </div>
+              <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-2xl font-extrabold text-slate-900">{stat.value}</p>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* 80G Certificate Section */}
-        <div className="bg-slate-900 rounded-2xl p-8 text-white flex flex-col md:flex-row items-center justify-between shadow-xl shadow-slate-900/10">
-           <div className="mb-4 md:mb-0 text-center md:text-left">
-             <h3 className="font-bold text-xl mb-1">FY 2024-25 Tax Certificate</h3>
-             <p className="text-sm text-slate-400">Consolidated 80G receipt for all your donations.</p>
-           </div>
-           <button 
-             disabled={history.length === 0}
-             className="bg-white text-slate-900 px-6 py-3 rounded-xl font-bold disabled:opacity-50 hover:bg-slate-100 transition-colors flex items-center gap-2"
-           >
-             <Download size={18} />
-             Download Summary
-           </button>
-        </div>
-
-        {/* History Table */}
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800 text-lg">Contribution History</h3>
-          </div>
+        {/* Improved Visual History (Timeline) */}
+        <div className="space-y-6">
+          <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+            <Calendar size={20} className="text-slate-400" />
+            Contribution History
+          </h3>
           
-          <div className="divide-y divide-slate-100">
-            {history.length === 0 ? (
-              <div className="p-16 text-center">
-                <Heart size={48} className="mx-auto text-slate-200 mb-4" />
-                <p className="text-slate-400 font-medium">No contributions found yet.</p>
-                <a href="/donate" className="text-indigo-600 font-bold mt-2 hover:underline inline-block">
-                  Make your first donation
-                </a>
-              </div>
-            ) : (
-                <div className="w-full text-left">
-                    <div className="hidden md:grid grid-cols-4 px-6 py-3 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                        <div>Cause</div>
-                        <div>Date</div>
-                        <div>Impact</div>
-                        <div className="text-right">Amount</div>
-                    </div>
-                    {history.map((item) => (
-                        <div key={item.id} className="p-6 md:py-4 md:px-6 flex flex-col md:grid md:grid-cols-4 gap-2 md:gap-0 items-start md:items-center hover:bg-slate-50 transition-colors">
-                            <div className="font-bold text-slate-900">{item.causeTitle}</div>
-                            <div className="text-sm text-slate-500">{item.date}</div>
-                            <div className="text-sm text-slate-600">
-                                <span className="inline-block px-2 py-1 rounded bg-indigo-50 text-indigo-700 text-xs font-bold">{item.units} Units</span>
-                            </div>
-                            <div className="text-right w-full md:w-auto">
-                                <span className="font-bold text-indigo-600">₹{item.amount.toLocaleString()}</span>
-                            </div>
-                        </div>
-                    ))}
+          {history.length === 0 ? (
+             <div className="bg-white rounded-2xl p-12 text-center border border-slate-200 border-dashed">
+                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Heart size={24} className="text-slate-300" />
                 </div>
-            )}
-          </div>
+                <h3 className="text-slate-900 font-bold mb-1">Your journey begins here</h3>
+                <p className="text-slate-500 text-sm mb-6">Make your first donation to see it appear on your timeline.</p>
+                <a href="/donate" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:scale-105 transition-transform">
+                   Make an Impact
+                </a>
+             </div>
+          ) : (
+            <div className="relative border-l-2 border-slate-200 ml-3 md:ml-6 space-y-8 pb-4">
+              {history.map((item, index) => {
+                const isPhonePe = item.paymentMethod === 'phonepe';
+                const PaymentIcon = isPhonePe ? Smartphone : CreditCard;
+                
+                return (
+                  <motion.div 
+                    key={item.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="relative pl-8 md:pl-12"
+                  >
+                    {/* Timeline Dot */}
+                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-4 border-indigo-600 shadow-sm" />
+
+                    <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+                       {/* Card Header */}
+                       <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">{item.date}</p>
+                            <h4 className="text-lg font-bold text-slate-900">Donation of ₹{item.amount?.toLocaleString()}</h4>
+                          </div>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${isPhonePe ? 'bg-purple-50 text-purple-700 border-purple-100' : 'bg-blue-50 text-blue-700 border-blue-100'}`}>
+                             <PaymentIcon size={12} />
+                             {isPhonePe ? 'PhonePe' : 'Razorpay'}
+                          </div>
+                       </div>
+
+                       {/* Cause Items Grid */}
+                       <div className="bg-slate-50 rounded-xl p-3 grid gap-2 mb-4">
+                          {item.cart?.map((cItem, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-sm">
+                               <div className="flex items-center gap-2">
+                                  <CheckCircle2 size={14} className="text-emerald-500" />
+                                  <span className="font-medium text-slate-700">{cItem.title}</span>
+                               </div>
+                               <span className="text-slate-500 text-xs font-bold">x{cItem.quantity}</span>
+                            </div>
+                          ))}
+                       </div>
+
+                       {/* Footer Actions */}
+                       <div className="flex gap-4 border-t border-slate-100 pt-3">
+                          <button className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                             <Download size={14} /> Download 80G Receipt
+                          </button>
+                       </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

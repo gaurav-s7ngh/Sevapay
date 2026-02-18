@@ -19,7 +19,6 @@ export default function DonatePage() {
     resetFlow 
   } = useDonation();
 
-  // Desktop view check for conditional logic
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 768);
@@ -54,7 +53,8 @@ export default function DonatePage() {
               )}
               {step === 3 && (
                 <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                  <PaymentSummary formData={formData} onBack={prevStep} onSuccess={nextStep} />
+                  {/* CHANGED: Passed setFormData */}
+                  <PaymentSummary formData={formData} setFormData={setFormData} onBack={prevStep} onSuccess={nextStep} />
                 </motion.div>
               )}
               {step === 4 && (
@@ -77,7 +77,7 @@ export default function DonatePage() {
                   <AmountSelection 
                     formData={formData} 
                     setFormData={setFormData} 
-                    onNext={null} // No next button needed in grid
+                    onNext={null} 
                     isDesktop={true}
                   />
                </div>
@@ -103,25 +103,12 @@ export default function DonatePage() {
                   animate={{ opacity: (formData.fullName && formData.email) ? 1 : 0.5, y: 0 }}
                   className={`glass-morphism rounded-[2rem] p-8 h-full min-h-[600px] border-t-4 border-t-emerald-500 transition-all duration-500 ${(formData.fullName && formData.email) ? '' : 'pointer-events-none blur-sm'}`}
                >
+                  {/* CHANGED: Passed setFormData */}
                   <PaymentSummary 
                     formData={formData} 
+                    setFormData={setFormData}
                     onBack={null} 
                     onSuccess={() => {
-                        // For desktop, we manually advance to step 4 (Success) which hides the grid
-                        // We need to use a hack or modify useDonation to allow jumping to 4
-                        // Since useDonation.nextStep increments, we might need to call it multiple times if we weren't tracking steps
-                        // But in Desktop mode, step is ignored until success.
-                        // Let's rely on useDonation state update.
-                        // We need to setStep(4). 
-                        // Our hook only exposes nextStep. Let's assume we are at 'step 1' logically but showing all.
-                        // We will add a jump function to useDonation or just loop nextStep.
-                        // For now, let's just assume nextStep works if we were consistent. 
-                        // Actually, better to modify useDonation hook to export setStep, but I can't modify that file easily in this response block flow without reprinting it.
-                        // I'll assume nextStep takes us to success if we are at step 3. 
-                        // But we are not 'at' step 3. 
-                        // Simple fix: We will rely on internal logic.
-                        // If I call nextStep 3 times? 
-                        // Let's just create a local handleSuccess that calls nextStep until step 4.
                         let current = step;
                         while(current < 4) {
                             nextStep();
@@ -134,7 +121,6 @@ export default function DonatePage() {
              </div>
            )}
         </div>
-
       </div>
     </div>
   );

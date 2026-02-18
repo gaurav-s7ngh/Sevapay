@@ -1,11 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, ArrowRight, LayoutDashboard } from 'lucide-react';
+import { Check, ArrowRight, LayoutDashboard, CreditCard, Smartphone } from 'lucide-react';
 import { useTaxCalculator } from '../hooks/useTaxCalculator';
 
 export default function SuccessScreen({ formData, onReset, onViewDashboard }) {
   const { saved } = useTaxCalculator(formData.amount);
   const cart = formData.cart || [];
+  
+  // CHANGED: Helper to get payment method display
+  const isPhonePe = formData.paymentMethod === 'phonepe';
+  const paymentLabel = isPhonePe ? 'PhonePe' : 'Razorpay';
+  const PaymentIcon = isPhonePe ? Smartphone : CreditCard;
 
   return (
     <div className="h-full flex flex-col items-center justify-center text-center px-4 relative">
@@ -17,7 +22,12 @@ export default function SuccessScreen({ formData, onReset, onViewDashboard }) {
       </motion.div>
 
       <h2 className="text-2xl font-extrabold text-slate-900 mb-1">Impact Verified</h2>
-      <p className="text-slate-500 text-sm mb-6">Your contribution is now active.</p>
+      
+      {/* CHANGED: Display Payment Method */}
+      <div className="flex items-center justify-center gap-1.5 text-slate-500 mb-6 bg-slate-100 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+        <PaymentIcon size={12} />
+        <span>Paid via {paymentLabel}</span>
+      </div>
 
       {/* Intelligence Summary Card */}
       <motion.div 

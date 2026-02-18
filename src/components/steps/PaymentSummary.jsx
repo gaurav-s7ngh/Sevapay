@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
-import { ShieldCheck, ArrowRight, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { ShieldCheck, ArrowRight, ArrowLeft, Loader2, CreditCard, Smartphone } from 'lucide-react';
 import { useTaxCalculator } from '../../hooks/useTaxCalculator';
 
-export default function PaymentSummary({ formData, onBack, onSuccess, isDesktop = false }) {
+export default function PaymentSummary({ formData, setFormData, onBack, onSuccess, isDesktop = false }) {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('razorpay'); 
   const { saved } = useTaxCalculator(formData.amount);
   const cart = formData.cart || [];
 
   const handlePay = () => {
     setIsProcessing(true);
     setTimeout(() => {
+      // CHANGED: Save payment method to global state
+      if (setFormData) {
+        setFormData(prev => ({ ...prev, paymentMethod: paymentMethod }));
+      }
+      
       setIsProcessing(false);
       onSuccess();
     }, 2000);
@@ -17,12 +23,14 @@ export default function PaymentSummary({ formData, onBack, onSuccess, isDesktop 
 
   return (
     <div className="h-full flex flex-col">
-      <div className="mb-6">
+      <div className="mb-4">
         <h2 className="text-xl font-bold text-slate-900">3. Confirm & Pay</h2>
         <p className="text-sm text-slate-500">Review your cart before donating.</p>
       </div>
 
-      <div className="space-y-4 flex-grow overflow-y-auto max-h-[300px] custom-scrollbar pr-2">
+      {/* CHANGED: Removed max-h-[300px] and added flex-1 min-h-0 to fix scrolling issue */}
+      <div className="space-y-4 flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1">
+        
         {/* Cart Items List */}
         <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden">
            {cart.map((item, index) => (
@@ -40,7 +48,7 @@ export default function PaymentSummary({ formData, onBack, onSuccess, isDesktop 
            
            <div className="bg-slate-100 px-4 py-3 flex justify-between items-center border-t border-slate-200">
               <span className="text-slate-600 font-bold text-sm">Total Donation</span>
-              <span className="text-xl font-extrabold text-slate-900">₹{formData.amount.toLocaleString()}</span>
+              <span className="text-xl font-extrabold text-slate-900">₹{formData.amount?.toLocaleString()}</span>
            </div>
         </div>
 
@@ -58,14 +66,43 @@ export default function PaymentSummary({ formData, onBack, onSuccess, isDesktop 
              <span className="text-[10px] text-slate-400">Effective Cost: ₹{(formData.amount - saved).toLocaleString()}</span>
            </div>
         </div>
+
+        {/* Payment Methods */}
+        <div className="pt-2">
+           <h3 className="text-sm font-bold text-slate-900 mb-2">Select Payment Method</h3>
+           <div className="grid grid-cols-2 gap-3">
+              <div 
+                onClick={() => setPaymentMethod('razorpay')}
+                className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
+                  paymentMethod === 'razorpay' 
+                    ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500 shadow-sm' 
+                    : 'bg-white border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                   <CreditCard size={16} />
+                </div>
+                <span className={`text-sm font-bold ${paymentMethod === 'razorpay' ? 'text-blue-700' : 'text-slate-600'}`}>Razorpay</span>
+              </div>
+
+              <div 
+                onClick={() => setPaymentMethod('phonepe')}
+                className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
+                  paymentMethod === 'phonepe' 
+                    ? 'bg-purple-50 border-purple-500 ring-1 ring-purple-500 shadow-sm' 
+                    : 'bg-white border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white">
+                   <Smartphone size={16} />
+                </div>
+                <span className={`text-sm font-bold ${paymentMethod === 'phonepe' ? 'text-purple-700' : 'text-slate-600'}`}>PhonePe</span>
+              </div>
+           </div>
+        </div>
       </div>
 
       <div className="mt-auto pt-6">
-        <div className="flex gap-2 items-start p-3 mb-4 bg-amber-50 text-amber-800 rounded-lg border border-amber-100 text-[11px] leading-tight">
-             <AlertCircle size={14} className="shrink-0 mt-0.5" />
-             <p>Payment gateway integration (Razorpay/PhonePe) will be enabled in production.</p>
-        </div>
-
         <div className="flex gap-3">
             {!isDesktop && (
                 <button
@@ -80,7 +117,9 @@ export default function PaymentSummary({ formData, onBack, onSuccess, isDesktop 
             <button
             onClick={handlePay}
             disabled={isProcessing || !formData.amount}
-            className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-80 disabled:cursor-not-allowed"
+            className={`flex-1 py-4 text-white rounded-2xl font-bold shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-80 disabled:cursor-not-allowed ${
+               paymentMethod === 'phonepe' ? 'bg-purple-600 shadow-purple-500/20' : 'bg-slate-900'
+            }`}
             >
             {isProcessing ? (
                 <>
@@ -89,7 +128,7 @@ export default function PaymentSummary({ formData, onBack, onSuccess, isDesktop 
                 </>
             ) : (
                 <>
-                <span>Pay ₹{formData.amount.toLocaleString()}</span>
+                <span>Pay ₹{formData.amount?.toLocaleString()}</span>
                 <ArrowRight size={18} />
                 </>
             )}
