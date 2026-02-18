@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Check } from 'lucide-react';
 
 export default function ImpactCard({ cause, isSelected, onSelect, quantity, onUpdateQuantity }) {
   const progress = (cause.raised / cause.goal) * 100;
@@ -19,53 +19,53 @@ export default function ImpactCard({ cause, isSelected, onSelect, quantity, onUp
     <motion.div
       layout
       onClick={() => onSelect(cause.id)}
-      className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group
+      className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group flex flex-col h-full
         ${isSelected 
-          ? 'border-indigo-500 bg-white shadow-xl shadow-indigo-500/10 ring-1 ring-indigo-500' 
-          : 'border-slate-200 bg-white/50 hover:bg-white hover:border-indigo-300'
+          ? 'border-indigo-600 bg-white shadow-xl shadow-indigo-500/10 ring-2 ring-indigo-600' 
+          : 'border-slate-200 bg-white hover:border-indigo-300 hover:shadow-md'
         }`}
     >
-      {/* Background Progress Bar (Subtle) */}
-      <div className="absolute bottom-0 left-0 h-1 bg-slate-100 w-full">
-        <div className="h-full bg-emerald-500/50" style={{ width: `${progress}%` }} />
+      {/* Progress Bar */}
+      <div className="absolute top-0 left-0 h-1 bg-slate-100 w-full">
+        <div className="h-full bg-emerald-500" style={{ width: `${progress}%` }} />
       </div>
 
       <div className="p-5 flex flex-col h-full">
-        <div className="flex justify-between items-start mb-3">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">
+        <div className="flex justify-between items-start mb-3 mt-2">
+          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md ${isSelected ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'}`}>
             {cause.category}
           </span>
           {isSelected && (
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-              SELECTED
-            </motion.div>
+            <div className="bg-indigo-600 text-white p-1 rounded-full">
+               <Check size={12} strokeWidth={3} />
+            </div>
           )}
         </div>
 
-        <h3 className="text-lg font-bold text-slate-800 leading-tight mb-1">{cause.title}</h3>
-        <p className="text-xs text-slate-500 mb-4 line-clamp-2">{cause.desc}</p>
+        <h3 className="text-lg font-bold text-slate-900 leading-tight mb-2">{cause.title}</h3>
+        <p className="text-sm text-slate-500 mb-6 line-clamp-2 leading-relaxed flex-grow">{cause.desc}</p>
 
-        <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+        <div className="pt-4 border-t border-slate-100 flex items-end justify-between">
           <div>
-            <div className="text-xs text-slate-400 font-medium uppercase">Cost / Unit</div>
-            <div className="text-lg font-bold text-slate-900">₹{cause.unitCost}</div>
+            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Cost per Unit</div>
+            <div className="text-xl font-extrabold text-slate-900">₹{cause.unitCost.toLocaleString()}</div>
           </div>
 
-          {/* Quantity Controls (Only visible when selected) */}
+          {/* Quantity Controls */}
           {isSelected ? (
             <motion.div 
-              initial={{ opacity: 0, x: 20 }} 
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3 bg-slate-900 text-white rounded-xl p-1.5 shadow-lg"
+              initial={{ opacity: 0, scale: 0.9 }} 
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg shadow-lg"
             >
-              <button onClick={handleDecrement} className="p-1 hover:bg-white/20 rounded-lg transition"><Minus size={14} /></button>
-              <span className="font-bold w-4 text-center text-sm">{quantity}</span>
-              <button onClick={handleIncrement} className="p-1 hover:bg-white/20 rounded-lg transition"><Plus size={14} /></button>
+              <button onClick={handleDecrement} className="p-2 text-white hover:bg-white/20 rounded-md transition"><Minus size={14} /></button>
+              <span className="font-bold text-white w-6 text-center text-sm tabular-nums">{quantity}</span>
+              <button onClick={handleIncrement} className="p-2 text-white hover:bg-white/20 rounded-md transition"><Plus size={14} /></button>
             </motion.div>
           ) : (
-             <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                <Plus size={16} />
-             </div>
+             <button className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all">
+                <Plus size={20} />
+             </button>
           )}
         </div>
       </div>

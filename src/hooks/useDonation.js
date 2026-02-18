@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 
 const INITIAL_DATA = {
-  amount: 0,
-  causeId: null,
-  causeTitle: '',
-  units: 0,
+  cart: [], // Now stores array of { id, title, unitCost, quantity, total }
+  amount: 0, // Grand total
   fullName: '',
   email: '',
   pan: '',
@@ -14,13 +12,13 @@ export const useDonation = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState(INITIAL_DATA);
   
-  // Load real history from localStorage on initialization
+  // Load real history from localStorage
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem('sd_donation_history');
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Persist history whenever it changes
+  // Persist history
   useEffect(() => {
     localStorage.setItem('sd_donation_history', JSON.stringify(history));
   }, [history]);
@@ -29,7 +27,6 @@ export const useDonation = () => {
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
   
   const resetFlow = () => {
-    // Save the successful donation to history before resetting
     if (formData.amount > 0) {
       const newEntry = {
         ...formData,

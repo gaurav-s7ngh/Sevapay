@@ -1,8 +1,7 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { User, Mail, CreditCard, ArrowRight, ArrowLeft } from 'lucide-react';
 
-export default function DonorDetails({ formData, setFormData, onNext, onBack }) {
+export default function DonorDetails({ formData, setFormData, onNext, onBack, isDesktop = false }) {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -12,8 +11,8 @@ export default function DonorDetails({ formData, setFormData, onNext, onBack }) 
   return (
     <div className="h-full flex flex-col">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-900">Your Details</h2>
-        <p className="text-sm text-slate-500">Where should we send the 80G receipt?</p>
+        <h2 className="text-xl font-bold text-slate-900">2. Your Details</h2>
+        <p className="text-sm text-slate-500">For your 80G tax receipt.</p>
       </div>
 
       <div className="space-y-4">
@@ -43,13 +42,13 @@ export default function DonorDetails({ formData, setFormData, onNext, onBack }) 
           />
         </div>
 
-        {/* PAN Input (New for 80G Context) */}
+        {/* PAN Input */}
         <div className="relative group">
           <CreditCard className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={20} />
           <input
             type="text"
             name="pan"
-            placeholder="PAN (Optional for Tax Benefit)"
+            placeholder="PAN (Optional)"
             value={formData.pan}
             onChange={handleChange}
             maxLength={10}
@@ -60,23 +59,35 @@ export default function DonorDetails({ formData, setFormData, onNext, onBack }) 
           </span>
         </div>
       </div>
+      
+      {/* Decorative content for desktop empty space */}
+      {isDesktop && (
+          <div className="mt-8 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+             <p className="text-xs text-indigo-800 leading-relaxed">
+                <strong>Why do we need this?</strong> <br/>
+                To generate your automated 80G Tax Certificate immediately after donation. Your data is encrypted.
+             </p>
+          </div>
+      )}
 
-      <div className="mt-auto flex gap-3 pt-6">
-        <button
-          onClick={onBack}
-          className="px-6 py-4 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-colors"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <button
-          onClick={onNext}
-          disabled={!isValid}
-          className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl shadow-slate-900/20 disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
-        >
-          <span>Review Contribution</span>
-          <ArrowRight size={18} />
-        </button>
-      </div>
+      {!isDesktop && (
+        <div className="mt-auto flex gap-3 pt-6">
+          <button
+            onClick={onBack}
+            className="px-6 py-4 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-colors"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <button
+            onClick={onNext}
+            disabled={!isValid}
+            className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl shadow-slate-900/20 disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            <span>Review</span>
+            <ArrowRight size={18} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

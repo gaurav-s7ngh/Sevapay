@@ -3,7 +3,6 @@
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   
-  /* Custom Animation Keyframes for Tailwind v4 */
   --animate-fade-in: fade-in 0.5s ease-out;
   --animate-slide-up: slide-up 0.5s ease-out;
   
@@ -19,34 +18,32 @@
 }
 
 @layer utilities {
-  /* The core "Premium" Glass effect */
   .glass-morphism {
-    @apply bg-white/80 backdrop-blur-2xl border border-white/60 shadow-2xl shadow-slate-200/50;
+    @apply bg-white/80 backdrop-blur-xl border border-white/60 shadow-xl shadow-indigo-500/5;
   }
   
-  /* Subtle gradient text */
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-indigo-800 to-slate-900;
   }
 
-  /* Hide scrollbar for clean UI in cards */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
   }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-slate-300;
   }
 }
 
-/* Global Reset */
 body {
   @apply bg-slate-50 text-slate-900 antialiased;
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
-/* Custom Selection Color */
 ::selection {
   @apply bg-indigo-500/20 text-indigo-900;
 }

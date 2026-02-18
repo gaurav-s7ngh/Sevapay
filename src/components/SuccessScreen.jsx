@@ -5,6 +5,7 @@ import { useTaxCalculator } from '../hooks/useTaxCalculator';
 
 export default function SuccessScreen({ formData, onReset, onViewDashboard }) {
   const { saved } = useTaxCalculator(formData.amount);
+  const cart = formData.cart || [];
 
   return (
     <div className="h-full flex flex-col items-center justify-center text-center px-4 relative">
@@ -16,25 +17,28 @@ export default function SuccessScreen({ formData, onReset, onViewDashboard }) {
       </motion.div>
 
       <h2 className="text-2xl font-extrabold text-slate-900 mb-1">Impact Verified</h2>
-      <p className="text-slate-500 text-sm mb-8">Your contribution is now active.</p>
+      <p className="text-slate-500 text-sm mb-6">Your contribution is now active.</p>
 
       {/* Intelligence Summary Card */}
       <motion.div 
         initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
-        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-8"
+        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-8 text-left"
       >
-        <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+        <p className="text-[10px] text-slate-400 uppercase font-bold mb-2">Impact Summary</p>
+        <div className="space-y-2 mb-4">
+            {cart.map(item => (
+                <div key={item.id} className="flex justify-between text-sm">
+                    <span className="text-slate-700 font-medium">{item.quantity} x {item.title}</span>
+                    <span className="text-slate-900 font-bold">₹{item.total.toLocaleString()}</span>
+                </div>
+            ))}
+        </div>
+        
+        <div className="h-px bg-slate-200 mb-4"></div>
+        
+        <div className="grid grid-cols-2 gap-y-1">
           <div className="text-left">
-            <p className="text-[10px] text-slate-400 uppercase font-bold">You Funded</p>
-            <p className="text-lg font-bold text-slate-800">{formData.units} x {formData.causeTitle}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-[10px] text-slate-400 uppercase font-bold">Total</p>
-            <p className="text-lg font-bold text-slate-800">₹{formData.amount.toLocaleString()}</p>
-          </div>
-          <div className="col-span-2 h-px bg-slate-200"></div>
-          <div className="text-left">
-            <p className="text-[10px] text-emerald-600 uppercase font-bold">Est. Tax Saved</p>
+            <p className="text-[10px] text-emerald-600 uppercase font-bold">Tax Saved</p>
             <p className="text-sm font-bold text-emerald-600">₹{saved.toLocaleString()}</p>
           </div>
           <div className="text-right">

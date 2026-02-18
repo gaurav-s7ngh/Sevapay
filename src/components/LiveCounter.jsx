@@ -1,53 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap } from 'lucide-react';
+import { Zap, Activity } from 'lucide-react';
 
 export default function LiveCounter() {
   const [count, setCount] = useState(14205);
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
-    // Simulate live donations
     const interval = setInterval(() => {
-      const shouldUpdate = Math.random() > 0.6; // Random chance
+      const shouldUpdate = Math.random() > 0.6;
       if (shouldUpdate) {
         setCount(prev => prev + 1);
-        
-        // Show subtle toast
         const names = ["Aarav", "Priya", "Rahul", "Ananya", "Vikram"];
-        const randomName = names[Math.floor(Math.random() * names.length)];
         const cities = ["Mumbai", "Delhi", "Bangalore", "Pune"];
-        const randomCity = cities[Math.floor(Math.random() * cities.length)];
-        
-        setNotification(`${randomName} from ${randomCity} just donated!`);
-        
-        // Hide toast after 3s
+        setNotification(`${names[Math.floor(Math.random() * names.length)]} from ${cities[Math.floor(Math.random() * cities.length)]} just donated!`);
         setTimeout(() => setNotification(null), 3000);
       }
     }, 4000);
-
     return () => clearInterval(interval);
   }, []);
 
   return (
     <>
-      {/* Fixed Counter Pill */}
-      <div className="fixed top-6 right-6 z-40">
-        <div className="bg-white/80 backdrop-blur-md border border-slate-200/50 shadow-lg rounded-full px-4 py-2 flex items-center gap-2">
-          <div className="relative">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-            <div className="absolute inset-0 bg-emerald-500 rounded-full animate-ping opacity-20" />
+      {/* Counter Pill - Adjusted top to sit below Navbar or nicely in corner */}
+      <div className="fixed bottom-6 right-6 z-40 hidden md:block">
+        <div className="bg-white/90 backdrop-blur-md border border-slate-200 shadow-2xl rounded-2xl p-4 flex items-center gap-4">
+          <div className="bg-emerald-50 p-3 rounded-xl">
+             <Activity size={20} className="text-emerald-600" />
           </div>
-          <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Impact Makers</span>
-          <div className="w-px h-3 bg-slate-200 mx-1" />
-          <motion.span 
-            key={count}
-            initial={{ y: -10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="text-sm font-extrabold text-slate-900 tabular-nums"
-          >
-            {count.toLocaleString()}
-          </motion.span>
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Impact Makers</p>
+            <motion.p 
+                key={count}
+                initial={{ y: 5, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="text-xl font-extrabold text-slate-900 tabular-nums"
+            >
+                {count.toLocaleString()}
+            </motion.p>
+          </div>
         </div>
       </div>
 
@@ -55,15 +46,15 @@ export default function LiveCounter() {
       <AnimatePresence>
         {notification && (
           <motion.div
-            initial={{ opacity: 0, y: 20, x: '-50%' }}
-            animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: 10, x: '-50%' }}
-            className="fixed bottom-8 left-1/2 z-50 flex items-center gap-3 px-4 py-2.5 bg-slate-900 text-white rounded-full shadow-xl shadow-slate-900/20 whitespace-nowrap"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 left-6 z-50 flex items-center gap-3 px-5 py-3 bg-slate-900 text-white rounded-xl shadow-2xl shadow-slate-900/20 max-w-sm"
           >
-            <div className="bg-white/10 p-1 rounded-full">
-              <Zap size={12} className="text-yellow-400" fill="currentColor" />
+            <div className="bg-white/10 p-1.5 rounded-full shrink-0">
+              <Zap size={14} className="text-yellow-400" fill="currentColor" />
             </div>
-            <span className="text-xs font-medium">{notification}</span>
+            <span className="text-sm font-medium">{notification}</span>
           </motion.div>
         )}
       </AnimatePresence>
