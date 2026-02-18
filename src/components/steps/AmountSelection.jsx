@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Wallet } from 'lucide-react';
 import ImpactCard from '../ImpactCard';
-import TaxVisualizer from '../modals/TaxVisualizer';
+import TaxVisualizer from '../modals/TaxVisualiser';
 
 const CAUSES = [
   { id: 1, title: "Sponsor a Meal", category: "Hunger", unitCost: 40, desc: "Nutritious meal for a child.", raised: 12000, goal: 50000 },
