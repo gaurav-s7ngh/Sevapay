@@ -27,6 +27,7 @@ export default function App() {
     step, 
     formData, 
     setFormData, 
+    history, // <--- ADD THIS
     nextStep, 
     prevStep, 
     resetFlow 
