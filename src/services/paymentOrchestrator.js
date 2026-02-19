@@ -30,9 +30,8 @@ export const processPaymentWithProtection = async (amount, cart, onLogUpdate) =>
   onLogUpdate(`Authorizing ₹${amount} via ${primary.name}...`);
   await delay(1200);
 
-  // DEMO TRICK: If amount ends in '1' (e.g., 1001), force a gateway failure to show retry logic
-  const isDemoFailure = amount % 10 === 1;
-
+  // DEMO TRICK:change the trigger to a specific, easily reachable amount like ₹500 (which is exactly 1 unit of Disaster Relief).
+const isDemoFailure = amount === 500;
   if (isDemoFailure || !primary.isHealthy) {
     onLogUpdate(`⚠️ ${primary.name} Timeout. Revenue Protection Active.`);
     await delay(1000);
