@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Heart, CreditCard, Smartphone, CheckCircle2, Leaf, Globe, Calculator, ArrowRight, ArrowUp, Sparkles, Building2, Trophy, Medal, MessageSquare } from 'lucide-react';
+import { 
+  ShieldCheck, Heart, CreditCard, Smartphone, CheckCircle2, 
+  Leaf, Globe, Calculator, ArrowRight, ArrowUp, Sparkles, 
+  Building2, Trophy, Medal, MessageSquare, TrendingDown, Wallet, Download 
+} from 'lucide-react';
 import { useDonation } from '../hooks/useDonation';
 import { useTaxCalculator } from '../hooks/useTaxCalculator';
 import Navbar from '../components/Navbar';
@@ -28,7 +32,6 @@ const LEADERBOARD = [
   { rank: 6, name: "Neha Singh", amount: 75000, cause: "Provide Meals" },
 ];
 
-// Dedicated Comments Data
 const COMMENTS = [
   { name: "John D.", text: "Keep up the amazing work! For a greener tomorrow.", time: "10 mins ago" },
   { name: "Sarah W.", text: "Happy to help the kids get back to school.", time: "1 hour ago" },
@@ -47,6 +50,7 @@ export default function Home() {
   const [count, setCount] = useState(14205432);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [txnId, setTxnId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('razorpay');
   const [customQty, setCustomQty] = useState('');
   const [isCustomMode, setIsCustomMode] = useState(false);
@@ -81,7 +85,10 @@ export default function Home() {
 
   const handlePay = () => {
     setIsProcessing(true);
+    // Generate a mock transaction ID
+    const generatedTxnId = `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
     setTimeout(() => {
+      setTxnId(generatedTxnId);
       setIsProcessing(false);
       setIsSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -102,33 +109,97 @@ export default function Home() {
   const activeCause = CAUSES.find(c => c.id === formData.cart?.[0]?.id);
 
   if (isSuccess) {
+    const date = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+    
     return (
-      <div className="min-h-screen bg-[#EAE3D2] flex flex-col items-center justify-center p-6 relative overflow-hidden">
-        <motion.div initial={{ scale: 0.8, opacity: 0, y: 50 }} animate={{ scale: 1, opacity: 1, y: 0 }} transition={{ type: "spring", bounce: 0.5 }} className="botanical-card p-10 max-w-lg w-full text-center relative z-10">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring" }} className="w-28 h-28 bg-[#6B8060] rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg shadow-[#6B8060]/40">
-            <CheckCircle2 size={60} className="text-[#F5F2EB]" />
-          </motion.div>
+      <div className="min-h-screen bg-[#EAE3D2] pt-24 pb-12 px-6 flex flex-col items-center relative print:bg-white print:p-0">
+        {/* CSS to isolate the receipt during printing */}
+        <style>{`
+          @media print {
+            body * { visibility: hidden; }
+            #receipt-card, #receipt-card * { visibility: visible; }
+            #receipt-card { position: absolute; left: 0; top: 0; width: 100%; max-width: 100%; padding: 40px; margin: 0; background: white; border: none; box-shadow: none; border-radius: 0; }
+            .no-print { display: none !important; }
+          }
+        `}</style>
+        
+        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-2xl mt-12">
           
-          <h2 className="text-4xl font-black text-[#1A1F16] mb-3">Impact Cultivated!</h2>
-          <p className="text-[#4A5E40] mb-8 text-lg">Thank you, <span className="font-bold text-[#1A1F16]">{formData.fullName}</span>. You just funded <span className="font-bold text-[#1A1F16]">{formData.cart[0].quantity}x {formData.cart[0].title}</span>.</p>
-          
-          <div className="bg-[#EAE3D2] rounded-2xl p-6 mb-8 text-left border border-[#6B8060]/20">
-            <p className="text-sm text-[#4A5E40] font-bold uppercase tracking-widest mb-2">Transaction Receipt</p>
-            <div className="flex justify-between items-end">
-              <div>
-                <p className="text-3xl font-black text-[#1A1F16]">₹{formData.amount.toLocaleString()}</p>
-                {saved > 0 && <p className="text-sm text-[#4A5E40] font-bold mt-1">+ ₹{saved.toLocaleString()} Est. Tax Saved</p>}
-              </div>
-              <Sparkles className="text-[#6B8060]" size={30} />
-            </div>
+          <div className="text-center mb-8 no-print">
+             <div className="w-20 h-20 bg-[#6B8060] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#6B8060]/40">
+               <CheckCircle2 size={40} className="text-[#F5F2EB]" />
+             </div>
+             <h2 className="text-4xl font-black text-[#1A1F16]">Payment Successful!</h2>
+             <p className="text-[#4A5E40] mt-2 text-lg">Your automated 80G tax receipt is ready.</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <button onClick={resetDonation} className="py-4 botanical-btn-primary rounded-2xl font-black flex items-center justify-center gap-2 text-sm">
-              Donate Again <ArrowRight size={16} />
+          {/* 🧾 THE OFFICIAL RECEIPT CARD */}
+          <div id="receipt-card" className="bg-white rounded-[2rem] p-8 md:p-12 shadow-xl border border-[#6B8060]/20 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-8 opacity-5">
+                 <ShieldCheck size={200} />
+              </div>
+
+              <div className="flex justify-between items-start mb-8 border-b border-gray-100 pb-8 relative z-10">
+                 <div>
+                   <h2 className="text-3xl font-black text-[#1A1F16]">80G Tax Receipt</h2>
+                   <p className="text-gray-500 mt-1 font-medium">Official certificate for tax deduction claims.</p>
+                 </div>
+                 <div className="text-right">
+                   <h3 className="text-xl font-extrabold tracking-tight text-[#1A1F16]">
+                    Seva<span className="text-[#6B8060]">Pay</span>
+                   </h3>
+                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-8 mb-10 text-sm relative z-10">
+                 <div>
+                   <p className="text-gray-400 uppercase tracking-widest text-[10px] font-bold mb-2">Donor Details</p>
+                   <p className="font-bold text-[#1A1F16] text-xl mb-1">{formData.fullName}</p>
+                   <p className="text-gray-600 mb-1">{formData.email}</p>
+                   <p className="text-gray-600 font-mono mt-2 bg-gray-50 inline-block px-3 py-1 rounded-md border border-gray-100">PAN: {formData.pan || 'Not Provided'}</p>
+                 </div>
+                 <div className="text-right">
+                   <p className="text-gray-400 uppercase tracking-widest text-[10px] font-bold mb-2">Donation Summary</p>
+                   <p className="font-black text-4xl text-[#6B8060] mb-2">₹{formData.amount.toLocaleString()}</p>
+                   <p className="text-gray-600 font-medium">{date}</p>
+                   <p className="text-gray-400 font-mono text-xs mt-2">Txn ID: {txnId}</p>
+                 </div>
+              </div>
+
+              {/* NGO details required for tax claims */}
+              <div className="bg-[#F5F2EB] rounded-2xl p-6 border border-[#6B8060]/20 text-sm relative z-10">
+                <p className="text-[#4A5E40] uppercase tracking-widest text-[10px] font-bold mb-4">NGO Details (Required for 80G Claim)</p>
+                <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                  <div>
+                    <span className="block text-gray-500 text-xs mb-1">Organization Name</span>
+                    <span className="font-bold text-gray-800">SevaPay Foundation</span>
+                  </div>
+                  <div>
+                    <span className="block text-gray-500 text-xs mb-1">80G Registration Number</span>
+                    <span className="font-bold text-gray-800 font-mono tracking-wide">80G-DEL-2023-9876</span>
+                  </div>
+                  <div>
+                    <span className="block text-gray-500 text-xs mb-1">NGO PAN</span>
+                    <span className="font-bold text-gray-800 font-mono tracking-wide">AAATN1234E</span>
+                  </div>
+                  <div>
+                    <span className="block text-gray-500 text-xs mb-1">Registered Address</span>
+                    <span className="font-bold text-gray-800 leading-snug block">123, Green Valley, Cyber Hub, Delhi, India</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-gray-100 text-center relative z-10 flex flex-col items-center justify-center">
+                 <p className="text-xs text-gray-400 max-w-sm">This is a computer-generated receipt and does not require a physical signature.</p>
+              </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mt-8 no-print">
+            <button onClick={() => window.print()} className="py-4 botanical-btn-primary rounded-xl font-bold flex items-center justify-center gap-2 text-lg shadow-xl">
+              <Download size={20} /> Download Receipt
             </button>
-            <button onClick={() => window.location.href='/history'} className="py-4 bg-[#EAE3D2] border-2 border-[#6B8060] text-[#1A1F16] hover:bg-[#dfd7c3] transition-colors rounded-2xl font-black flex items-center justify-center gap-2 text-sm">
-              View History
+            <button onClick={resetDonation} className="py-4 bg-white border border-[#6B8060]/30 text-[#1A1F16] rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
+              Return Home
             </button>
           </div>
         </motion.div>
@@ -140,33 +211,108 @@ export default function Home() {
     <div className="min-h-screen bg-[#EAE3D2] font-sans relative">
       <Navbar />
 
-      <section className="pt-40 pb-20 px-6 flex flex-col items-center justify-center text-center relative z-10">
-        <motion.div style={{ y: y1 }} className="absolute top-20 left-10 w-64 h-64 bg-[#6B8060]/10 rounded-full blur-[80px] -z-10" />
-        
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#F5F2EB] border border-[#6B8060]/30 text-[#4A5E40] font-bold text-sm mb-8 shadow-sm">
-            <Leaf size={16} className="text-[#6B8060]" /> Nurturing Change Worldwide
-          </div>
-          <h1 className="text-6xl md:text-8xl font-black text-[#1A1F16] tracking-tighter mb-8 leading-[1.1]">
-            Grow the Good. <br />
-            <span className="text-[#6B8060]">Rooted in Action.</span>
-          </h1>
+      {/* ✨ VISUALLY STUNNING HERO SECTION */}
+      <section className="pt-32 pb-16 px-6 relative z-10 overflow-hidden">
+        {/* Background Ambient Gradients */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#6B8060]/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#EAE3D2] rounded-full blur-[100px] -z-10 pointer-events-none" />
+
+        <div className="max-w-[1400px] mx-auto grid lg:grid-cols-12 gap-12 lg:gap-8 items-center mt-12">
           
-          <div className="botanical-card p-8 md:p-10 inline-block mb-12">
-            <p className="text-sm md:text-base font-bold text-[#4A5E40] uppercase tracking-[0.2em] mb-4">Total Impact Created</p>
-            <div className="flex justify-center items-center gap-2 md:gap-3">
-              {count.toString().split('').map((num, i) => (
-                <motion.div key={`${i}-${num}`} initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-12 h-16 md:w-20 md:h-24 bg-[#EAE3D2] border border-[#6B8060]/20 rounded-xl flex items-center justify-center shadow-inner">
-                  <span className="text-4xl md:text-6xl font-black text-[#1A1F16]">{num}</span>
-                </motion.div>
-              ))}
+          {/* Main Hero Text (Left side) */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8 }} 
+            className="lg:col-span-7 text-left order-2 lg:order-1"
+          >
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#F5F2EB] border border-[#6B8060]/30 text-[#4A5E40] font-bold text-sm mb-8 shadow-sm">
+              <Sparkles size={16} className="text-[#6B8060]" /> Welcome to SevaPay
             </div>
-          </div>
-        </motion.div>
+            
+            <h1 className="text-6xl md:text-7xl xl:text-8xl font-black text-[#1A1F16] tracking-tighter mb-8 leading-[1.05]">
+              Empower Lives. <br />
+              <span className="text-[#6B8060]">Claim Your Impact.</span>
+            </h1>
+            
+            <p className="text-[#4A5E40] text-lg md:text-xl max-w-2xl mb-10 leading-relaxed font-medium">
+              Join thousands of donors making a transparent difference. Support verified NGOs, automatically save on taxes under section 80G, and track your global impact instantly.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-6">
+              <button onClick={scrollToDonate} className="px-8 py-4 bg-[#1A1F16] text-[#F5F2EB] rounded-2xl font-black text-lg hover:bg-[#2c3625] transition-all flex items-center gap-2 shadow-xl shadow-[#1A1F16]/20 transform hover:-translate-y-1">
+                Start Donating <ArrowRight size={20} />
+              </button>
+              
+              <div className="flex items-center">
+                 <div className="flex items-center ml-2">
+                    <div className="w-12 h-12 rounded-full border-4 border-[#EAE3D2] bg-gray-200 z-30 overflow-hidden shadow-sm"><img src="https://i.pravatar.cc/100?img=1" alt="user" className="w-full h-full object-cover" /></div>
+                    <div className="w-12 h-12 rounded-full border-4 border-[#EAE3D2] bg-gray-300 z-20 overflow-hidden -ml-4 shadow-sm"><img src="https://i.pravatar.cc/100?img=2" alt="user" className="w-full h-full object-cover" /></div>
+                    <div className="w-12 h-12 rounded-full border-4 border-[#EAE3D2] bg-[#6B8060] text-white flex items-center justify-center font-bold text-xs z-10 -ml-4 shadow-sm">+10k</div>
+                 </div>
+                 <span className="text-sm font-bold text-[#4A5E40] ml-4">Trusted Donors</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Visuals & Counter (Right side highlight) */}
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="lg:col-span-5 relative order-1 lg:order-2 mb-10 lg:mb-0"
+          >
+            {/* The Floating Image Area */}
+            <div className="relative rounded-[2.5rem] bg-[#F5F2EB]/80 backdrop-blur-md border border-[#6B8060]/20 p-8 shadow-2xl overflow-hidden aspect-square flex flex-col items-center justify-center">
+               <div className="absolute inset-0 bg-gradient-to-br from-[#6B8060]/10 to-transparent z-0 pointer-events-none" />
+               
+               <div className="relative z-10 w-full">
+                  <p className="text-xs font-black text-[#6B8060] uppercase tracking-[0.15em] mb-4 text-center">Real-Time Impact</p>
+                  
+                  {/* Sidebar Counter */}
+                  <div className="bg-[#1A1F16] rounded-[2rem] p-6 md:p-8 shadow-2xl flex flex-col items-center justify-center border border-[#6B8060]/30 transform hover:scale-[1.02] transition-transform duration-500 w-full max-w-sm mx-auto">
+                    <span className="text-xs md:text-sm text-[#A3B19B] font-bold uppercase tracking-widest mb-3">Total Funds Raised</span>
+                    <div className="flex justify-center items-center gap-1 w-full">
+                      <span className="text-3xl md:text-5xl text-[#6B8060] font-black mr-1 mt-1">₹</span>
+                      {count.toString().split('').map((num, i) => (
+                        <motion.div key={`${i}-${num}`} initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-7 h-10 md:w-10 md:h-14 bg-[#2a3123] rounded-lg flex items-center justify-center shadow-inner">
+                          <span className="text-2xl md:text-4xl font-black text-[#F5F2EB]">{num}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Floating Elements */}
+                  <motion.div 
+                    animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                    className="absolute -top-6 -left-6 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-3 border border-gray-100"
+                  >
+                     <div className="w-10 h-10 rounded-full bg-[#6B8060]/10 flex items-center justify-center text-[#6B8060]"><Leaf size={20}/></div>
+                     <div>
+                       <span className="block font-black text-sm text-[#1A1F16]">5M+ Trees</span>
+                       <span className="block text-xs text-gray-500 font-medium">Planted globally</span>
+                     </div>
+                  </motion.div>
+
+                  <motion.div 
+                    animate={{ y: [0, 15, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
+                    className="absolute -bottom-6 -right-6 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-3 border border-gray-100"
+                  >
+                     <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600"><Globe size={20}/></div>
+                     <div>
+                       <span className="block font-black text-sm text-[#1A1F16]">12 Countries</span>
+                       <span className="block text-xs text-gray-500 font-medium">Active impact</span>
+                     </div>
+                  </motion.div>
+               </div>
+            </div>
+          </motion.div>
+
+        </div>
       </section>
 
       {/* Main Donation Section */}
-      <section id="donate-section" className="max-w-[1400px] mx-auto px-6 py-12 pb-24 relative z-10">
+      <section id="donate-section" className="max-w-[1400px] mx-auto px-6 py-12 pb-24 relative z-10 mt-12">
         <div className="grid lg:grid-cols-12 gap-8 xl:gap-16 items-start">
           
           <div className="lg:col-span-7 space-y-16">
@@ -255,7 +401,7 @@ export default function Home() {
                     <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="botanical-input" placeholder="jane@example.com" />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="text-xs font-bold text-[#4A5E40] uppercase tracking-wider mb-2 block">PAN Number (For Receipt)</label>
+                    <label className="text-xs font-bold text-[#4A5E40] uppercase tracking-wider mb-2 block">PAN Number (For Auto-Receipt)</label>
                     <input type="text" value={formData.pan} onChange={(e) => setFormData({...formData, pan: e.target.value.toUpperCase()})} maxLength={10} className="botanical-input uppercase" placeholder="ABCDE1234F" />
                   </div>
                 </div>
@@ -264,33 +410,104 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-5 relative">
-            <div className="sticky top-32 botanical-card p-8 md:p-10 border-t-4 border-t-[#6B8060]">
-              <h3 className="text-2xl font-black text-[#1A1F16] mb-8 border-b border-[#6B8060]/20 pb-6">Donation Summary</h3>
+            <div className="sticky top-32 botanical-card p-8 md:p-10 border-t-4 border-t-[#6B8060] overflow-hidden relative">
               
-              <div className="space-y-5 mb-10">
-                <div className="flex justify-between items-center text-[#4A5E40]">
-                  <span className="font-medium text-lg">Contribution</span>
+              {/* Decorative background blur for the tax section */}
+              {saved > 0 && (
+                <div className="absolute top-24 right-0 w-40 h-40 bg-emerald-500/10 blur-[50px] rounded-full pointer-events-none" />
+              )}
+              
+              <h3 className="text-2xl font-black text-[#1A1F16] mb-8 border-b border-[#6B8060]/20 pb-6 flex items-center justify-between">
+                Donation Summary
+                <Wallet size={24} className="text-[#6B8060]" />
+              </h3>
+              
+              <div className="space-y-6 mb-10">
+                <div className="flex justify-between items-center text-[#4A5E40] px-2">
+                  <span className="font-medium text-lg">Total Contribution</span>
                   <span className="font-black text-[#1A1F16] text-xl">₹{formData.amount.toLocaleString()}</span>
                 </div>
                 
-                <div className="bg-[#6B8060]/10 border border-[#6B8060]/30 rounded-2xl p-4 flex justify-between items-center">
-                  <div>
-                    <span className="block text-[#4A5E40] font-bold text-sm">Est. Tax Savings</span>
-                    <span className="block text-[#4A5E40]/80 text-xs font-medium mt-0.5">
-                      {taxRegime === 'old' ? 'Under Old Regime (80G)' : 'Not applicable in New Regime'}
+                {/* 🌟 ENHANCED TAX SAVINGS CARD */}
+                <motion.div 
+                  initial={false}
+                  animate={saved > 0 ? { scale: 1.02, backgroundColor: "rgba(16, 185, 129, 0.08)" } : { scale: 1, backgroundColor: "rgba(107, 128, 96, 0.05)" }}
+                  className={`border rounded-3xl p-6 relative overflow-hidden transition-all duration-500 ${
+                    saved > 0 ? 'border-emerald-500/40 shadow-lg shadow-emerald-500/10' : 'border-[#6B8060]/20'
+                  }`}
+                >
+                  {saved > 0 && (
+                    <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-wider py-1.5 px-4 rounded-bl-2xl shadow-sm flex items-center gap-1">
+                      <TrendingDown size={14} strokeWidth={3} />
+                      Save {Math.round((saved / formData.amount) * 100)}%
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-center relative z-10 mt-2">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-inner ${saved > 0 ? 'bg-emerald-500/20 text-emerald-600' : 'bg-[#6B8060]/20 text-[#6B8060]'}`}>
+                        <ShieldCheck size={24} />
+                      </div>
+                      <div>
+                        <span className={`block font-black text-xl ${saved > 0 ? 'text-emerald-700' : 'text-[#4A5E40]'}`}>
+                          Est. Tax Savings
+                        </span>
+                        <span className={`block text-xs font-bold mt-1 ${saved > 0 ? 'text-emerald-600/80' : 'text-[#4A5E40]/70'}`}>
+                          {taxRegime === 'old' ? 'Under Old Regime (80G)' : 'Not applicable in New Regime'}
+                        </span>
+                      </div>
+                    </div>
+                    <span className={`font-black text-3xl tracking-tight ${saved > 0 ? 'text-emerald-600' : 'text-[#4A5E40]/50'}`}>
+                      - ₹{saved?.toLocaleString() || 0}
                     </span>
                   </div>
-                  <span className={`font-black text-xl ${saved > 0 ? 'text-[#4A5E40]' : 'text-[#4A5E40]/50'}`}>
-                    - ₹{saved?.toLocaleString() || 0}
-                  </span>
-                </div>
+                </motion.div>
+
+                {/* 📊 VISUAL BAR CHART FOR SAVINGS */}
+                {formData.amount > 0 && (
+                  <div className="space-y-3 px-2">
+                    <div className="h-4 w-full bg-[#EAE3D2] rounded-full overflow-hidden flex shadow-inner border border-[#6B8060]/10">
+                      <motion.div 
+                        initial={{ width: 0 }} 
+                        animate={{ width: `${Math.max(0, ((formData.amount - saved) / formData.amount) * 100)}%` }} 
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className="h-full bg-[#1A1F16]"
+                      />
+                      <motion.div 
+                        initial={{ width: 0 }} 
+                        animate={{ width: `${(saved / formData.amount) * 100}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className="h-full bg-emerald-500 relative"
+                      >
+                        <motion.div 
+                          animate={{ x: ['-100%', '200%'] }} 
+                          transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }} 
+                          className="absolute inset-0 bg-white/30 skew-x-12 w-1/2" 
+                        />
+                      </motion.div>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider px-1">
+                      <span className="text-[#1A1F16] flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#1A1F16] shadow-sm"/> Real Cost
+                      </span>
+                      <span className="text-emerald-600 flex items-center gap-2">
+                        Govt Pays Back <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm"/>
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 <div className="h-px bg-[#6B8060]/20 w-full my-6" />
                 
-                <div className="flex justify-between items-end">
-                  <span className="text-[#4A5E40] font-bold uppercase tracking-wider text-sm">Net Cost to You</span>
+                <div className="flex justify-between items-end bg-gradient-to-br from-[#F5F2EB] to-[#EAE3D2] p-6 rounded-[2rem] border border-[#6B8060]/20 shadow-sm">
+                  <div>
+                    <span className="text-[#4A5E40] font-black uppercase tracking-wider text-sm block mb-1">Effective Cost To You</span>
+                    <span className="text-xs text-[#4A5E40]/80 font-bold">Your actual out-of-pocket expense</span>
+                  </div>
                   <div className="text-right">
-                    <span className="text-5xl font-black text-[#1A1F16] tracking-tight">₹{Math.max(0, formData.amount - (saved || 0)).toLocaleString()}</span>
+                    <span className="text-5xl font-black text-[#1A1F16] tracking-tighter drop-shadow-sm">
+                      ₹{Math.max(0, formData.amount - (saved || 0)).toLocaleString()}
+                    </span>
                   </div>
                 </div>
               </div>
