@@ -5,17 +5,17 @@ import { useTaxCalculator } from '../../hooks/useTaxCalculator';
 export default function PaymentSummary({ formData, setFormData, onBack, onSuccess, isDesktop = false }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('razorpay'); 
-  const { saved } = useTaxCalculator(formData.amount);
   const cart = formData.cart || [];
+  
+  // 🌟 NEW: Consuming the progressive variables from the updated hook
+  const { taxSaved, effectiveCost } = useTaxCalculator(cart, 'old');
 
   const handlePay = () => {
     setIsProcessing(true);
     setTimeout(() => {
-      // CHANGED: Save payment method to global state
       if (setFormData) {
         setFormData(prev => ({ ...prev, paymentMethod: paymentMethod }));
       }
-      
       setIsProcessing(false);
       onSuccess();
     }, 2000);
@@ -28,7 +28,6 @@ export default function PaymentSummary({ formData, setFormData, onBack, onSucces
         <p className="text-sm text-slate-500">Review your cart before donating.</p>
       </div>
 
-      {/* CHANGED: Removed max-h-[300px] and added flex-1 min-h-0 to fix scrolling issue */}
       <div className="space-y-4 flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1">
         
         {/* Cart Items List */}
@@ -40,8 +39,12 @@ export default function PaymentSummary({ formData, setFormData, onBack, onSucces
                    <p className="font-bold text-slate-900">{item.title}</p>
                    <p className="text-xs text-slate-500">{item.quantity} units x ₹{item.unitCost}</p>
                 </div>
-                <div className="text-right font-bold text-slate-900">
-                   ₹{item.total.toLocaleString()}
+                <div className="text-right flex flex-col items-end">
+                   <span className="font-bold text-slate-900">₹{item.total.toLocaleString()}</span>
+                   {/* 🌟 NEW: Dynamic deduction badge based on your updated CAUSES array */}
+                   <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md mt-1 ${item.deductionRate === 100 ? 'bg-amber-400 text-amber-900' : 'bg-emerald-500 text-white'}`}>
+                     {item.deductionRate || 50}% 80G
+                   </span>
                 </div>
              </div>
            ))}
@@ -53,17 +56,17 @@ export default function PaymentSummary({ formData, setFormData, onBack, onSucces
         </div>
 
         {/* Intelligence Breakdown */}
-        <div className="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4 flex items-center justify-between">
+        <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 flex items-center justify-between shadow-sm">
            <div>
              <div className="flex items-center gap-1.5 mb-1">
-               <ShieldCheck size={14} className="text-emerald-500" />
-               <span className="text-xs font-bold text-emerald-600 uppercase">Smart Benefit</span>
+               <ShieldCheck size={14} className="text-emerald-600" />
+               <span className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Smart Benefit</span>
              </div>
              <p className="text-xs text-slate-500">Est. Tax Savings (80G)</p>
            </div>
            <div className="text-right">
-             <span className="block text-emerald-600 font-bold">+ ₹{saved.toLocaleString()}</span>
-             <span className="text-[10px] text-slate-400">Effective Cost: ₹{(formData.amount - saved).toLocaleString()}</span>
+             <span className="block text-emerald-600 font-black text-lg">- ₹{taxSaved?.toLocaleString() || 0}</span>
+             <span className="text-[10px] font-bold text-slate-500">Effective Cost: ₹{effectiveCost?.toLocaleString() || formData.amount}</span>
            </div>
         </div>
 
@@ -117,7 +120,7 @@ export default function PaymentSummary({ formData, setFormData, onBack, onSucces
             <button
             onClick={handlePay}
             disabled={isProcessing || !formData.amount}
-            className={`flex-1 py-4 text-white rounded-2xl font-bold shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-80 disabled:cursor-not-allowed ${
+            className={`flex-1 py-4 text-white rounded-2xl font-black text-lg shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-80 disabled:cursor-not-allowed ${
                paymentMethod === 'phonepe' ? 'bg-purple-600 shadow-purple-500/20' : 'bg-slate-900'
             }`}
             >
