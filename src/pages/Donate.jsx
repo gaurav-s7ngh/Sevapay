@@ -11,6 +11,7 @@ import PaymentSummary from '../components/steps/PaymentSummary';
 import SuccessScreen from '../components/SuccessScreen';
 
 // 🌟 NEW: The NGO Deduction Directory
+// 🌟 NEW: The NGO Deduction Directory
 const NGOTaxDirectory = () => (
   <div className="mb-12 glass-morphism rounded-[2rem] p-6 md:p-8 border border-slate-200 shadow-sm bg-white/50">
     <div className="flex items-center gap-3 mb-6">
@@ -19,7 +20,7 @@ const NGOTaxDirectory = () => (
       </div>
       <div>
         <h3 className="text-xl font-black text-slate-900">Official 80G Deduction Directory</h3>
-        <p className="text-sm text-slate-500">Know your tax benefits before you build your cart.</p>
+        <p className="text-sm text-slate-500">100% Deductible means the full amount is removed from your taxable income.</p>
       </div>
     </div>
 
@@ -27,7 +28,7 @@ const NGOTaxDirectory = () => (
       {/* 100% Bracket */}
       <div className="bg-amber-50 rounded-2xl p-6 border border-amber-200 relative overflow-hidden">
         <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-[10px] font-black uppercase px-4 py-1.5 rounded-bl-xl shadow-sm">
-          100% Exemption
+          100% Deductible
         </div>
         <h4 className="font-bold text-amber-900 flex items-center gap-2 mb-4">
           <Globe size={18} /> Govt. Backed Funds
@@ -35,8 +36,14 @@ const NGOTaxDirectory = () => (
         <div className="space-y-3">
            <div className="bg-white p-4 rounded-xl shadow-sm border border-amber-100 flex justify-between items-center">
              <div>
-               <span className="block font-bold text-slate-900">National Children's Fund</span>
-               <span className="text-xs font-bold text-amber-600 uppercase tracking-wide">Fund Education</span>
+               <span className="block font-bold text-slate-900">PMNRF (Prime Minister's Relief)</span>
+               <span className="text-xs font-bold text-amber-600 uppercase tracking-wide">Disaster Relief</span>
+             </div>
+           </div>
+           <div className="bg-white p-4 rounded-xl shadow-sm border border-amber-100 flex justify-between items-center">
+             <div>
+               <span className="block font-bold text-slate-900">Swachh Bharat Kosh</span>
+               <span className="text-xs font-bold text-amber-600 uppercase tracking-wide">Sanitation</span>
              </div>
            </div>
         </div>
@@ -45,7 +52,7 @@ const NGOTaxDirectory = () => (
       {/* 50% Bracket */}
       <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-200 relative overflow-hidden">
         <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-black uppercase px-4 py-1.5 rounded-bl-xl shadow-sm">
-          50% Exemption
+          50% Deductible
         </div>
         <h4 className="font-bold text-emerald-900 flex items-center gap-2 mb-4">
           <Building2 size={18} /> Verified Private NGOs
@@ -53,14 +60,14 @@ const NGOTaxDirectory = () => (
         <div className="space-y-3">
            <div className="bg-white p-4 rounded-xl shadow-sm border border-emerald-100 flex justify-between items-center">
              <div>
-               <span className="block font-bold text-slate-900">SankalpTaru Foundation</span>
-               <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Plant Trees</span>
+               <span className="block font-bold text-slate-900">The Akshaya Patra Foundation</span>
+               <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Provide Meals</span>
              </div>
            </div>
            <div className="bg-white p-4 rounded-xl shadow-sm border border-emerald-100 flex justify-between items-center">
              <div>
-               <span className="block font-bold text-slate-900">Akshaya Patra</span>
-               <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Provide Meals</span>
+               <span className="block font-bold text-slate-900">SankalpTaru Foundation</span>
+               <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Plant Trees</span>
              </div>
            </div>
         </div>

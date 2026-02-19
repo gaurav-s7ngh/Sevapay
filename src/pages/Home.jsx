@@ -11,17 +11,19 @@ import Navbar from '../components/Navbar';
 import Leaderboard from '../components/Leaderboard';
 import CommunityWall from '../components/CommunityWall';
 import ReceiptCard from '../components/RecieptCard';
+import TaxExplanationSection from '../components/TaxExplanationSection';
 // Data
+// Data with Real Indian NGOs & Govt Funds
 const CAUSES = [
-  { id: 1, title: "Plant Trees", desc: "SankalpTaru Foundation", category: "Environment", unitCost: 100, icon: Leaf, deductionRate: 50 },
-  { id: 2, title: "Provide Meals", desc: "Akshaya Patra", category: "Hunger", unitCost: 50, icon: Heart, deductionRate: 50 },
-  { id: 3, title: "Fund Education", desc: "National Children's Fund", category: "Education", unitCost: 1000, icon: Globe, deductionRate: 100 },
+  { id: 1, title: "Disaster Relief", desc: "PMNRF (Govt. of India)", category: "Relief", unitCost: 500, icon: Heart, deductionRate: 100 },
+  { id: 2, title: "Provide Meals", desc: "The Akshaya Patra Foundation", category: "Hunger", unitCost: 50, icon: Globe, deductionRate: 50 },
+  { id: 3, title: "Plant Trees", desc: "SankalpTaru Foundation", category: "Environment", unitCost: 100, icon: Leaf, deductionRate: 50 },
 ];
 
 const NGOS = [
-  { name: "SankalpTaru", focus: "Environment", impact: "5M+ Trees Planted", deduction: 50, logoText: "ST" },
+  { name: "PMNRF", focus: "Disaster Relief", impact: "Govt. Backed 100% Deduction", deduction: 100, logoText: "PM" },
   { name: "Akshaya Patra", focus: "Hunger", impact: "3M+ Daily Meals", deduction: 50, logoText: "AP" },
-  { name: "National Children's Fund", focus: "Education & Relief", impact: "Govt. Backed 100% Impact", deduction: 100, logoText: "NCF" },
+  { name: "SankalpTaru", focus: "Environment", impact: "5M+ Trees Planted", deduction: 50, logoText: "ST" },
 ];
 const INITIAL_COMMENTS = [
   { name: "John D.", text: "Keep up the amazing work! For a greener tomorrow.", time: "10 mins ago" },
@@ -289,9 +291,9 @@ const { taxSaved, effectiveCost } = useTaxCalculator(formData.cart, taxRegime);
                       <div className="flex justify-between items-start mb-4">
                         <Icon className={`${isSelected ? 'text-[#6B8060]' : 'text-[#4A5E40]/60'}`} size={36} />
                         {/* 🌟 Dynamic Deduction Badge */}
-                        <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-md ${cause.deductionRate === 100 ? 'bg-amber-400 text-amber-900' : 'bg-[#6B8060]/10 text-[#6B8060]'}`}>
-                          {cause.deductionRate}% 80G
-                        </span>
+                       <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-md ${cause.deductionRate === 100 ? 'bg-amber-400 text-amber-900' : 'bg-[#6B8060]/10 text-[#6B8060]'}`}>
+  {cause.deductionRate}% Deductible
+</span>
                       </div>
                       <h3 className="text-xl font-bold text-[#1A1F16] mb-1">{cause.title}</h3>
                       <p className="text-[#4A5E40] text-xs font-medium mb-3">{cause.desc}</p>
@@ -538,6 +540,8 @@ const { taxSaved, effectiveCost } = useTaxCalculator(formData.cart, taxRegime);
 
       <Leaderboard />
 
+      <TaxExplanationSection />
+
       {/* Partner NGOs Section */}
       <section className="py-24 border-t border-[#6B8060]/20">
         <div className="max-w-7xl mx-auto px-6">
@@ -552,7 +556,7 @@ const { taxSaved, effectiveCost } = useTaxCalculator(formData.cart, taxRegime);
                 
                 {/* 🌟 80G Tax Ribbon */}
                 <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-2xl font-black text-[10px] tracking-widest uppercase shadow-sm z-10 ${ngo.deduction === 100 ? 'bg-amber-400 text-amber-900' : 'bg-[#6B8060] text-[#F5F2EB]'}`}>
-                  {ngo.deduction}% Tax Exempt
+                  {ngo.deduction}% Deductible
                 </div>
                 
                 {/* Logo Container */}

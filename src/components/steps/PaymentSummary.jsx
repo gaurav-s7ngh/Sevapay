@@ -42,9 +42,10 @@ export default function PaymentSummary({ formData, setFormData, onBack, onSucces
                 <div className="text-right flex flex-col items-end">
                    <span className="font-bold text-slate-900">₹{item.total.toLocaleString()}</span>
                    {/* 🌟 NEW: Dynamic deduction badge based on your updated CAUSES array */}
-                   <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md mt-1 ${item.deductionRate === 100 ? 'bg-amber-400 text-amber-900' : 'bg-emerald-500 text-white'}`}>
-                     {item.deductionRate || 50}% 80G
-                   </span>
+                   {/* Change 80G to Deductible */}
+<span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md mt-1 ${item.deductionRate === 100 ? 'bg-amber-400 text-amber-900' : 'bg-emerald-500 text-white'}`}>
+  {item.deductionRate || 50}% Deductible
+</span>
                 </div>
              </div>
            ))}
